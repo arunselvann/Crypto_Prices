@@ -1,13 +1,14 @@
 import requests
-import pandas as pd
+from pandas import DataFrame, to_datetime
 import streamlit as st
 
 
-def get_data(currency_type, no_of_days, coin):
-    response = requests.get(f'https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency={currency_type}&days={no_of_days}&interval=daily')
+def get_data(currency_type: str, no_of_days: int, coin: str) -> DataFrame:
+    response = requests.get(f'https://api.coingecko.com/api/v3/coins/{coin}/market_chart?vs_currency={currency_type}'
+                            f'&days={no_of_days}&interval=daily')
     response = response.json()['prices']
-    df = pd.DataFrame(response, columns=['Date', currency_type])
-    df['Date'] = pd.to_datetime(df['Date'], unit='ms')
+    df = DataFrame(response, columns=['Date', currency_type])
+    df['Date'] = to_datetime(df['Date'], unit='ms')
     df.set_index(df.Date, inplace=True)
     df.drop('Date', axis=1, inplace=True)
     return df
